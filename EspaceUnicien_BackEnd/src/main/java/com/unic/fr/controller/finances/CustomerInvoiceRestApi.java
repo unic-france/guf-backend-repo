@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.guf.batch.data.entity.Customerinvoice;
-import com.unic.fr.controller.implementation.CreateCustomerInvoiceBean;
-import com.unic.fr.controller.implementation.CustomerInvoicesBean;
+import com.unic.fr.controller.finances.implementation.CreateCustomerInvoiceBean;
+import com.unic.fr.controller.finances.implementation.CustomerInvoicesBean;
 import com.unic.fr.exception.TechnicalException;
 import com.unic.fr.repository.AssignmentRepository;
 import com.unic.fr.repository.CustomerinvoiceRepository;

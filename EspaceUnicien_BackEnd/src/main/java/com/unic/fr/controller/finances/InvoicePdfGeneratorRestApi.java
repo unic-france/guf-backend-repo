@@ -16,7 +16,7 @@ import com.unic.fr.pdf.CustomerInvoicePdfGenerator;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-public class InvoicePdfGeneratorApi {
+public class InvoicePdfGeneratorRestApi {
 	
 	@Autowired
 	CustomerInvoicePdfGenerator customerInvoicePdfGenerator;

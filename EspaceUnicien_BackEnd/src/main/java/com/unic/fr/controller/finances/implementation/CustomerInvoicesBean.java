@@ -1,4 +1,4 @@
-package com.unic.fr.controller.implementation;
+package com.unic.fr.controller.finances.implementation;
 
 import java.util.List;
 
