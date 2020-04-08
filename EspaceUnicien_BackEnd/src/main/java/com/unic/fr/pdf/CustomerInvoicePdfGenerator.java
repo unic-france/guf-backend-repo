@@ -74,8 +74,10 @@ public class CustomerInvoicePdfGenerator {
 			}
 			
 			//Step2 : Vérifier si les prérequis (champs) minimum du customers invoice sont présent
-			if (!checkMinimumValue()) {
-				return new ResponseEntity<String>("Les prérequis du CustomerInvoice ne sont pas réunit",
+			String minimumValue = checkMinimumValue();
+			
+			if (null != minimumValue && !minimumValue.isEmpty()) {
+				return new ResponseEntity<String>(minimumValue,
 	                    HttpStatus.BAD_REQUEST);
 			}
 			
@@ -119,10 +121,7 @@ public class CustomerInvoicePdfGenerator {
 			invoice = Files.readAllBytes(generatedFile.toPath());
 			
 			this.customerInvoice.setCustomerinvoicedocument(invoice);
-			
-			
-			
-			
+
 			try {
 				//throw new Exception("Simulation problème MAJ Database");
 				this.customerinvoiceRepository.save(this.customerInvoice);
@@ -142,6 +141,20 @@ public class CustomerInvoicePdfGenerator {
 					response = new ResponseEntity<String>("L'insertion en base a échouée, la suppression du fichier généré aussi.",
 		                    HttpStatus.BAD_REQUEST);
 				}
+			}
+			finally {
+				
+				response = new ResponseEntity<String>("L'insertion en base a échouée",
+	                    HttpStatus.BAD_REQUEST);
+				
+				if(!generatedFile.delete()) {
+					response = new ResponseEntity<String>("L'insertion en base a échouée, merci de supprimer le fichier sur le disque.",
+		                    HttpStatus.BAD_REQUEST);
+				} else {
+					response = new ResponseEntity<String>("L'insertion en base a échouée, la suppression du fichier généré aussi.",
+		                    HttpStatus.BAD_REQUEST);
+				}
+				
 			}
 			
 		} catch (IOException ioE) {
@@ -188,123 +201,187 @@ public class CustomerInvoicePdfGenerator {
 		return periode;
 	}
 
-	private boolean checkMinimumValue() {
+	private String checkMinimumValue() {
 		
-		boolean generable = false;
+		String error = null;
 		
-		if (   null != this.groupCompany.getGroupcompanyname() 
-			&& !this.groupCompany.getGroupcompanyname().isEmpty()
+		if (null == this.groupCompany.getGroupcompanyname() 
+			|| this.groupCompany.getGroupcompanyname().isEmpty()) {
+			error = error+"groupCompanyName";
+		}
 			
-			&& null != this.assignment.getPartner1().getPartnercompany().getCompanyname()
-			&& !this.assignment.getPartner1().getPartnercompany().getCompanyname().isEmpty()
+		if (null == this.assignment.getPartner1().getPartnercompany().getCompanyname()
+			|| this.assignment.getPartner1().getPartnercompany().getCompanyname().isEmpty()) {
+			error = error+"getPartnercompanyName";
 			
-			&& null != this.assignment.getPartner1().getPartnercompany().getAddress1().getLine1recipient()
-			&& !this.assignment.getPartner1().getPartnercompany().getAddress1().getLine1recipient().isEmpty()
+		}
 			
-			&& null != this.assignment.getPartner1().getPartnercompany().getAddress1().getLine4streetnumberandstreetlabel()
-			&& !this.assignment.getPartner1().getPartnercompany().getAddress1().getLine4streetnumberandstreetlabel().isEmpty()
+		if (null == this.assignment.getPartner1().getPartnercompany().getAddress1().getLine1recipient()
+			|| this.assignment.getPartner1().getPartnercompany().getAddress1().getLine1recipient().isEmpty()) {
+			error = error+"getPartnercompanyAdresseLine1";
+		}
 			
-			&& null != this.assignment.getPartner1().getPartnercompany().getAddress1().getLine6zipcodelocalization()
-			&& !this.assignment.getPartner1().getPartnercompany().getAddress1().getLine6zipcodelocalization().isEmpty()
-			
-			&& null != this.assignment.getPartner1().getPartnercompany().getAddress1().getLine7country()
-			&& !this.assignment.getPartner1().getPartnercompany().getAddress1().getLine7country().isEmpty()
-			
-			&& null != this.assignment.getPartner1().getPartnercompany().getSiretnumber()
-			&& !this.assignment.getPartner1().getPartnercompany().getSiretnumber().isEmpty()
-			
-			&& null != this.assignment.getPartner1().getPartnercompany().getTvanumber()
-			&& !this.assignment.getPartner1().getPartnercompany().getTvanumber().isEmpty()
-			
-			&& null != this.assignment.getCustomer1().getCompanyname()
-			&& !this.assignment.getCustomer1().getCompanyname().isEmpty()
-			
-			&& null != this.assignment.getCustomerinvoicedetail().getAddress().getLine1recipient()
-			&& !this.assignment.getCustomerinvoicedetail().getAddress().getLine1recipient().isEmpty()
-			
-			&& null != this.assignment.getCustomerinvoicedetail().getAddress().getLine4streetnumberandstreetlabel()
-			&& !this.assignment.getCustomerinvoicedetail().getAddress().getLine4streetnumberandstreetlabel().isEmpty()
-			
-			&& null != this.assignment.getCustomerinvoicedetail().getAddress().getLine6zipcodelocalization()
-			&& !this.assignment.getCustomerinvoicedetail().getAddress().getLine6zipcodelocalization().isEmpty()
-			
-			&& null != this.assignment.getCustomerinvoicedetail().getAddress().getLine7country()
-			&& !this.assignment.getCustomerinvoicedetail().getAddress().getLine7country().isEmpty()
-			
-			&& null != this.assignment.getCustomerinvoicedetail().getInvoiceassignmentreferencenumber()
-			&& !this.assignment.getCustomerinvoicedetail().getInvoiceassignmentreferencenumber().isEmpty()
-			
-			&& null != this.customerInvoice.getCustomerinvoicereferencenumber()
-			&& !this.customerInvoice.getCustomerinvoicereferencenumber().isEmpty()
-			
-			&& null != this.customerInvoice.getPeriod()
-			
-			&& null != this.assignment.getDescriptionshort()
-			&& !this.assignment.getDescriptionshort().isEmpty()
-			
-			&& null != this.customerInvoice.getCustomerinvoicereferencenumber()
-			&& !this.customerInvoice.getCustomerinvoicereferencenumber().isEmpty()
-			
-			&& null != this.groupCompany.getGroupbillingcontact().getGroupcompanies()
-			&& !this.groupCompany.getGroupbillingcontact().getGroupcompanies().isEmpty()
-			
-			&& null != this.groupCompany.getGroupbillingcontact().getGroupbillingphonecontact()
-			&& !this.groupCompany.getGroupbillingcontact().getGroupbillingphonecontact().isEmpty()
-			
-			&& null != this.groupCompany.getGroupbillingcontact().getGroupbillingemailcontact()
-			&& !this.groupCompany.getGroupbillingcontact().getGroupbillingemailcontact().isEmpty()
-			
-			&& null != this.customerinvoicestatusHistoryList
-			&& this.customerinvoicestatusHistoryList.isEmpty()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getNumberofdaysworked()
-			
-			&& BigDecimal.valueOf((long)0) != this.assignment.getDaypricewithouttax()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTaxrate()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTotalamountwithouttax()
-			
-			&& null != this.customerInvoice.getDuedate()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTotalamountwithouttax()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTaxamount()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTotalamountwithtax()
-			
-			&& BigDecimal.valueOf((long)0) != this.customerInvoice.getTotalamountwithtax()
-			
-			&& null != this.groupCompany.getGroupbankingdetail().getIbannumber()
-			&& !this.groupCompany.getGroupbankingdetail().getIbannumber().isEmpty()
-			
-			&& null != this.groupCompany.getGroupbankingdetail().getBiccode()
-			&& !this.groupCompany.getGroupbankingdetail().getBiccode().isEmpty()
-			
-			&& null != this.groupCompany.getSiretnumber()
-			&& !this.groupCompany.getSiretnumber().isEmpty()
-			
-			&& null != this.groupCompany.getTvanumber()
-			&& !this.groupCompany.getTvanumber().isEmpty()
-			
-			&& null != this.groupCompany.getAddress1().getLine1recipient()
-			&& !this.groupCompany.getAddress1().getLine1recipient().isEmpty()
-			
-			&& null != this.groupCompany.getAddress1().getLine4streetnumberandstreetlabel()
-			&& !this.groupCompany.getAddress1().getLine4streetnumberandstreetlabel().isEmpty()
-			
-			&& null != this.groupCompany.getAddress1().getLine6zipcodelocalization()
-			&& !this.groupCompany.getAddress1().getLine6zipcodelocalization().isEmpty()
-			
-			&& null != this.groupCompany.getAddress1().getLine7country()
-			&& !this.groupCompany.getAddress1().getLine7country().isEmpty()) 
-			
-			{
-				generable = true;
-				
-			}
+		if (null == this.assignment.getPartner1().getPartnercompany().getAddress1().getLine4streetnumberandstreetlabel()
+		|| this.assignment.getPartner1().getPartnercompany().getAddress1().getLine4streetnumberandstreetlabel().isEmpty()){
+			error = error+"getPartnercompanyAdresseLine4";
+		}
 		
-		return generable;
+		if (null == this.assignment.getPartner1().getPartnercompany().getAddress1().getLine6zipcodelocalization()
+		|| this.assignment.getPartner1().getPartnercompany().getAddress1().getLine6zipcodelocalization().isEmpty()){
+			error = error+"getPartnercompanyAdresseLine6";
+		}
+		
+		if (null == this.assignment.getPartner1().getPartnercompany().getAddress1().getLine7country()
+		|| this.assignment.getPartner1().getPartnercompany().getAddress1().getLine7country().isEmpty()){
+			error = error+"getPartnercompanyAdresseLine7";
+		}
+		
+		if (null == this.assignment.getPartner1().getPartnercompany().getSiretnumber()
+		|| this.assignment.getPartner1().getPartnercompany().getSiretnumber().isEmpty()){
+			error = error+"getPartnerSiretNumber";
+		}
+		
+		if (null == this.assignment.getPartner1().getPartnercompany().getTvanumber()
+		|| this.assignment.getPartner1().getPartnercompany().getTvanumber().isEmpty()){
+			error = error+"getPartnertvanumber";
+		}
+		
+		if (null == this.assignment.getCustomer1().getCompanyname()
+		|| this.assignment.getCustomer1().getCompanyname().isEmpty()){
+			error = error+"assignmentPartnerCompanyname";
+		}
+		
+		if (null == this.assignment.getCustomerinvoicedetail().getAddress().getLine1recipient()
+		|| this.assignment.getCustomerinvoicedetail().getAddress().getLine1recipient().isEmpty()){
+			error = error+"CustomerinvoiceDetailAdresseLine1";
+		}
+		
+		if (null == this.assignment.getCustomerinvoicedetail().getAddress().getLine4streetnumberandstreetlabel()
+		|| this.assignment.getCustomerinvoicedetail().getAddress().getLine4streetnumberandstreetlabel().isEmpty()){
+			error = error+"CustomerinvoiceDetailAdresseLine4";
+		}
+		
+		if (null == this.assignment.getCustomerinvoicedetail().getAddress().getLine6zipcodelocalization()
+		|| this.assignment.getCustomerinvoicedetail().getAddress().getLine6zipcodelocalization().isEmpty()){
+			error = error+"CustomerinvoiceDetailAdresseLine6";
+		}
+		
+		if (null == this.assignment.getCustomerinvoicedetail().getAddress().getLine7country()
+		|| this.assignment.getCustomerinvoicedetail().getAddress().getLine7country().isEmpty()){
+			error = error+"CustomerinvoiceDetailAdresseLine7";
+		}
+		
+		if (null == this.assignment.getCustomerinvoicedetail().getInvoiceassignmentreferencenumber()
+		|| this.assignment.getCustomerinvoicedetail().getInvoiceassignmentreferencenumber().isEmpty()){
+			error = error+"AssignmentCustomerinvoiceReferenceNumber";
+		}
+		
+		if (null == this.customerInvoice.getCustomerinvoicereferencenumber()
+		|| this.customerInvoice.getCustomerinvoicereferencenumber().isEmpty()){
+			error = error+"CustomerinvoiceReferenceNumber";
+		}
+		
+		if (null == this.customerInvoice.getPeriod()) {
+			error = error+"CustomerinvoicePeriod";
+		}
+		
+		if (null == this.assignment.getDescriptionshort()
+		|| this.assignment.getDescriptionshort().isEmpty()){
+			error = error+"AssignmentDescriptionshort";
+		}
+		
+		if (null == this.groupCompany.getGroupbillingcontact().getGroupcompanies()
+		|| this.groupCompany.getGroupbillingcontact().getGroupcompanies().isEmpty()){
+			error = error+"GroupCompanyGroupbillingContactGroupcompanies";
+		}
+		
+		if (null == this.groupCompany.getGroupbillingcontact().getGroupbillingphonecontact()
+		|| this.groupCompany.getGroupbillingcontact().getGroupbillingphonecontact().isEmpty()){
+			error = error+"GroupCompanyGroupbillingGroupbillingphonecontact";
+		}
+		
+		if (null == this.groupCompany.getGroupbillingcontact().getGroupbillingemailcontact()
+		|| this.groupCompany.getGroupbillingcontact().getGroupbillingemailcontact().isEmpty()){
+			error = error+"GroupCompanyGroupbillingGroupbillingEmailcontact";
+		}
+		
+		if (null == this.customerinvoicestatusHistoryList
+		|| this.customerinvoicestatusHistoryList.isEmpty()){
+			error = error+"customerinvoicestatusHistoryList";
+		}
+		
+		if (BigDecimal.valueOf((long)0) == this.customerInvoice.getNumberofdaysworked()) {
+			error = error+"customerInvoiceNumberofdaysworked";
+		}
+		
+		if (BigDecimal.valueOf((long)0) == this.assignment.getDaypricewithouttax()) {
+			error = error+"assignmentDaypricewithouttax";
+		}
+		
+		if (BigDecimal.valueOf((long)0) == this.customerInvoice.getTaxrate()) {
+			error = error+"customerInvoiceTaxrate";
+		}
+		
+		if (BigDecimal.valueOf((long)0) == this.customerInvoice.getTotalamountwithouttax()) {
+			error = error+"customerInvoiceTotalamountwithouttax";
+		}
+		
+		if (null == this.customerInvoice.getDuedate()) {
+			error = error+"customerInvoiceDuedate";
+		}
+		
+		
+		if (BigDecimal.valueOf((long)0) == this.customerInvoice.getTaxamount()) {
+			error = error+"customerInvoiceTaxamount";
+		}
+		
+		
+		if (BigDecimal.valueOf((long)0) == this.customerInvoice.getTotalamountwithtax()) {
+			error = error+"customerInvoiceTotalamountwithtax";
+		}
+		
+		if (null == this.groupCompany.getGroupbankingdetail().getIbannumber()
+		|| this.groupCompany.getGroupbankingdetail().getIbannumber().isEmpty()){
+			error = error+"groupCompanyGroupbankingdetailIbannumber";
+		}
+		
+		if (null == this.groupCompany.getGroupbankingdetail().getBiccode()
+		|| this.groupCompany.getGroupbankingdetail().getBiccode().isEmpty()){
+			error = error+"groupCompanyGroupbankingdetailBiccode";
+		}
+		
+		if (null == this.groupCompany.getSiretnumber()
+		|| this.groupCompany.getSiretnumber().isEmpty()){
+			error = error+"groupCompanySiretnumber";
+		}
+		
+		if (null == this.groupCompany.getTvanumber()
+		|| this.groupCompany.getTvanumber().isEmpty()){
+			error = error+"groupCompanyTvanumber";
+		}
+		
+		if (null == this.groupCompany.getAddress1().getLine1recipient()
+		|| this.groupCompany.getAddress1().getLine1recipient().isEmpty()){
+			error = error+"groupCompanyAddressLine1";
+		}
+		
+		if (null == this.groupCompany.getAddress1().getLine4streetnumberandstreetlabel()
+		|| this.groupCompany.getAddress1().getLine4streetnumberandstreetlabel().isEmpty()){
+			error = error+"groupCompanyAddressLine4";
+		}
+		
+		if (null == this.groupCompany.getAddress1().getLine6zipcodelocalization()
+		|| this.groupCompany.getAddress1().getLine6zipcodelocalization().isEmpty()){
+			error = error+"groupCompanyAddressLine6";
+		}
+		
+		if (null == this.groupCompany.getAddress1().getLine7country()
+		|| this.groupCompany.getAddress1().getLine7country().isEmpty()){
+			error = error+"groupCompanyAddressLine7";
+		} 
+
+		
+		return error;
 	}
 	
 	public String getDirectoryPath(String originalOrDuplicata) {

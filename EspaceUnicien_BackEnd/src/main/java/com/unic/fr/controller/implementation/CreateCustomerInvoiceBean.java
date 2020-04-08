@@ -1,5 +1,6 @@
 package com.unic.fr.controller.implementation;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -40,6 +41,8 @@ import com.unic.fr.utils.AppProperties;
 @Transactional
 @Configuration
 public class CreateCustomerInvoiceBean {
+	
+	private MultipartFile craFileUpload;
 
 	@Autowired
 	PartnerRepository partnerRepository;
@@ -71,13 +74,26 @@ public class CreateCustomerInvoiceBean {
 	@Autowired
 	RefworkingdaysRepository refworkingdaysRepository;
 	
-	public ResponseEntity<String> createCustomerInvoice( String assignmentreferencenumber, String periodParam, BigDecimal numberofdaysworked, BigDecimal totalMountWithoutTax, MultipartFile craFileUpload) throws TechnicalException {
+
+	public ResponseEntity<String> createCustomerInvoiceWithoutCra(String assignmentreferencenumber, String periodParam, BigDecimal numberofdaysworked) throws TechnicalException, IOException {
+		
+		return createCustomerInvoice(assignmentreferencenumber, periodParam, numberofdaysworked) ;
+	}
+	
+	public ResponseEntity<String> createCustomerInvoiceWithCra( String assignmentreferencenumber, String periodParam, BigDecimal numberofdaysworked, MultipartFile craFileUpload) throws TechnicalException, IOException {
+		
+		this.craFileUpload = craFileUpload;
+		
+		return createCustomerInvoice(assignmentreferencenumber, periodParam, numberofdaysworked) ;
+	}
+	
+	
+	public ResponseEntity<String> createCustomerInvoice( String assignmentreferencenumber, String periodParam, BigDecimal numberofdaysworked) throws TechnicalException, IOException {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date period = null;
 		
 		try {period = sdf.parse(periodParam);} catch (java.text.ParseException e) { System.out.println(e.getMessage()); }
-		
 	
 		Assignment assignment = assignmentRepository.getAssignmentByAssignmentreferencenumber(assignmentreferencenumber);
 		if (null == assignment) throw new TechnicalException("Aucune facture pour cette référence : "+assignmentreferencenumber);
@@ -136,7 +152,9 @@ public class CreateCustomerInvoiceBean {
 		customerinvoicestatushistory.setStatus(appProperties.getPartnerCreation());
 		customerinvoicestatushistory.setDatecreation(new Timestamp(System.currentTimeMillis()));
 		customerinvoicestatushistory.setNote(null);
-		customerinvoice.setCustomerinvoicestatushistories(new ArrayList<Customerinvoicestatushistory>());
+		if (null == customerinvoice.getCustomerinvoicestatushistories()) {
+			customerinvoice.setCustomerinvoicestatushistories(new ArrayList<Customerinvoicestatushistory>());
+		}
 		customerinvoice.getCustomerinvoicestatushistories().add(customerinvoicestatushistory);
 		customerinvoicestatushistory.setCustomerinvoice(customerinvoice);
 		
@@ -147,14 +165,16 @@ public class CreateCustomerInvoiceBean {
 		customerinvoice.setCustomerinvoicereferencenumber(getPersonalProductionInvoiceReferenceNumber(appProperties.getPersonalProductionInvoiceReferenceNumber()));
 		
 		customerinvoice.setTaxrate(appProperties.getTaxrate());
-		customerinvoice.setTotalamountwithouttax(totalMountWithoutTax);
-		customerinvoice.setTotalamountwithtax(getTotalMountWithTax(totalMountWithoutTax, customerinvoice.getTaxrate()));
+		customerinvoice.setTotalamountwithouttax(calculateTotalMountWithoutTax(assignment.getDaypricewithouttax(), numberofdaysworked));
+		customerinvoice.setTotalamountwithtax(getTotalMountWithTax(customerinvoice.getTotalamountwithouttax(), customerinvoice.getTaxrate()));
 		customerinvoice.setTaxamount(getTotalAmount(customerinvoice));
 		customerinvoice.setCurrency(appProperties.getCurrency());
 		customerinvoice.setDueamount(customerinvoice.getTotalamountwithtax());
 		customerinvoice.setNumberofdaysworked(numberofdaysworked);
 		
-		
+		if (null != this.craFileUpload && !this.craFileUpload.isEmpty()) {
+			customerinvoice.setActivityreportdocument(this.craFileUpload.getBytes());
+		}
 		
 		//Génération de la facture
 		this.customerInvoicePdfGenerator.init(customerinvoice);
@@ -163,6 +183,11 @@ public class CreateCustomerInvoiceBean {
 		return reponse;
 	}
 	
+	private BigDecimal calculateTotalMountWithoutTax(BigDecimal tjm, BigDecimal numberofdaysworked) {
+		
+		return tjm.multiply(numberofdaysworked);
+	}
+
 	private Partnernetwork getCurrentPartnernetwork(Assignment assignment) {
 		
 		Partnernetwork partner = null;
@@ -197,16 +222,6 @@ public class CreateCustomerInvoiceBean {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.DAY_OF_MONTH, 30);
 		return cal.getTime();
-	}
-	
-	private String getPeriod(Date period) {
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(period);
-		
-		String periode = ""+cal.get(Calendar.MONTH)+ cal.get(Calendar.YEAR);
-		System.out.println("period : "+periode);
-		return periode;
 	}
 
 	private BigDecimal getTotalAmount(Customerinvoice customerinvoice) {
@@ -346,5 +361,6 @@ public class CreateCustomerInvoiceBean {
 	
 		return equal;
 	}
+
 		
 }

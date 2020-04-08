@@ -42,6 +42,8 @@ public class AssignmentDto {
 	
 	private List<CustomerinvoiceDto> customerInvoices;
 	
+	//private 
+	
 	private List<AssignmentstatushistoryDto> assignmentStatusHistories;
 	
 	public Integer getIdassignment() {
