@@ -14,6 +14,8 @@ public interface PartnerRepository extends JpaRepository<Partner, Long>{
 	Partner getByPuid(String Uuid);
 	
 	List<Assignment> getListAssignmentByIdpartner(Integer idpartner) throws AssignmentNotFoundException;
+	
+	Partner getPartnerByPartnerprofilePartnercontactEmailpartner(String emailpartner);
 
 
 }

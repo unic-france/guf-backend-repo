@@ -62,19 +62,11 @@ public class PartnerRestAPI {
 			
 			partnernetworkListDto = modelMapper.map(partnernetworks, 
 												new TypeToken<List<PartnernetworkDto>>(){}.getType());
-			
-			//partnernetworkListDto = modelMapper.map(Utils.convertToList(partnernetworks), 
-			//		new TypeToken<Set<PartnernetworkDto>>(){}.getType());
-			
+
 			partnerDto = modelMapper.map(partner, PartnerDto.class);
 			
 			partnerDto.setPartnernetworks(partnernetworkListDto);
-			
-			/*if (null!= partner.getPartnerprofile() && null != partner.getPartnerprofile().getPartnercontact()) {
-				email = partner.getPartnerprofile().getPartnercontact().get
-				partnerDto.getPartnerprofile().getPartnerContact().setEmailpartner(email);
-			}*/
-						
+	
 		
 		}catch(Exception e) {
 			
@@ -105,9 +97,7 @@ public class PartnerRestAPI {
 			
 			partnernetworkListDto = modelMapper.map(partnernetworks, 
 														new TypeToken<List<PartnernetworkDto>>(){}.getType());
-			//modelMapper.map(Utils.convertToList(partnernetworks), 
-			//									new TypeToken<List<PartnernetworkDto>>(){}.getType());
-			
+		
 			partnerDto = modelMapper.map(partner, PartnerDto.class);
 			
 			partnerDto.setPartnernetworks(partnernetworkListDto);

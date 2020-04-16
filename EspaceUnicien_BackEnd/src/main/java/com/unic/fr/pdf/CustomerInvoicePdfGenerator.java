@@ -121,6 +121,7 @@ public class CustomerInvoicePdfGenerator {
 			invoice = Files.readAllBytes(generatedFile.toPath());
 			
 			this.customerInvoice.setCustomerinvoicedocument(invoice);
+			this.customerInvoice.setCustomerinvoicedocumentname(generatedFile.getName());
 
 			try {
 				//throw new Exception("Simulation problème MAJ Database");

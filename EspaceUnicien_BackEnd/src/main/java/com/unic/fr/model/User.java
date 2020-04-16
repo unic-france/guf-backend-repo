@@ -34,7 +34,7 @@ public class User{
     private Long id;
 	
 	@NotBlank
-    private String Uuid;
+    private String uuid;
 
     @NotBlank
     @Size(min=3, max = 50)
@@ -57,6 +57,8 @@ public class User{
     @NotBlank
     @Size(min=6, max = 100)
     private String password;
+    
+    private boolean onetimepassword;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", 
@@ -66,12 +68,13 @@ public class User{
 
     public User() {}
 
-    public User(String name, String username, String firstName, String email, String password) {
+    public User(String name, String username, String firstName, String email, String password, boolean oneTimePassword) {
         this.name = name;
         this.firstName = firstName;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.onetimepassword = oneTimePassword;
     }
 
     public Long getId() {
@@ -83,11 +86,11 @@ public class User{
     }
 
     public String getUuid() {
-		return Uuid;
+		return this.uuid;
 	}
 
 	public void setUuid(String uuid) {
-		Uuid = uuid;
+		this.uuid = uuid;
 	}
 
 	public String getUsername() {
@@ -128,6 +131,14 @@ public class User{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public boolean getOnetimepassword() {
+        return this.onetimepassword;
+    }
+
+    public void setOnetimepassword(boolean oneTimePassword) {
+        this.onetimepassword = oneTimePassword;
     }
 
     public Set<Role> getRoles() {

@@ -159,7 +159,7 @@ public class CreateCustomerInvoiceBean {
 		customerinvoicestatushistory.setCustomerinvoice(customerinvoice);
 		
 		//Mise à jour des champs du customerInvoice
-		
+		customerinvoice.setDaypricewithouttax(assignment.getDaypricewithouttax());
 		customerinvoice.setPeriod(period);
 		customerinvoice.setDuedate(getDueDate());
 		customerinvoice.setCustomerinvoicereferencenumber(getPersonalProductionInvoiceReferenceNumber(appProperties.getPersonalProductionInvoiceReferenceNumber()));
@@ -174,6 +174,7 @@ public class CreateCustomerInvoiceBean {
 		
 		if (null != this.craFileUpload && !this.craFileUpload.isEmpty()) {
 			customerinvoice.setActivityreportdocument(this.craFileUpload.getBytes());
+			customerinvoice.setActivityreportdocumentname(this.craFileUpload.getName());
 		}
 		
 		//Génération de la facture
@@ -293,14 +294,14 @@ public class CreateCustomerInvoiceBean {
 			Refworkingday ref = refworkingdaysRepository.getOneByMonthAndYear(month, year);
 			
 			if (numberofdaysworked > ref.getWorkingdays()) {
-				message="Le nombre de jour saisie est supérieur au nombre de jour ouvré pour ce mois ci."+"/n"+
+				message="Le nombre de jour saisie est supérieur au nombre de jour ouvré pour ce mois ci."+"\n"+
 						"Merci de modifier le nombre de jour ou contacter le support en cas de problème (contact@unic-france.com)";
 			}
 		
 		} catch (ParseException e) {
 			System.out.println(e.getMessage());
 			
-			message = "Problème technique, merci de reprendre dans quelques minutes"+"/n"
+			message = "Problème technique, merci de reprendre dans quelques minutes"+"\n"
 						+"Contacter le support si le problème persiste";
 			throw new TechnicalException(message); 
 		}
@@ -317,7 +318,7 @@ public class CreateCustomerInvoiceBean {
 		for (Customerinvoice custInv : customerInvoices) {
 			
 			if (comparePeriod(custInv.getPeriod(), periodParam)) {
-				message="Il existe déjà une facture pour cette période."+"/n"+
+				message="Il existe déjà une facture pour cette période."+"\n"+
 						"Merci de modifier la période ou contacter le support en cas de problème (contact@unic-france.com)";
 				break;
 			}

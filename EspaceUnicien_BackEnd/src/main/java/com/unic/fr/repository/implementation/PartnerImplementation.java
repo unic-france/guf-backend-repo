@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +15,23 @@ import org.springframework.data.domain.Sort;
 
 import com.guf.batch.data.entity.Assignment;
 import com.guf.batch.data.entity.Partner;
+import com.guf.batch.data.entity.Partnercontact;
+import com.guf.batch.data.entity.Partnerprofile;
 import com.unic.fr.exception.AssignmentNotFoundException;
 import com.unic.fr.repository.PartnerRepository;
+import com.unic.fr.repository.PartnercontactRepository;
+import com.unic.fr.repository.PartnerprofileRepository;
 
 public class PartnerImplementation implements PartnerRepository {
 
 	@PersistenceContext
 	EntityManager em;
+	
+    @Autowired
+    PartnercontactRepository partnercontactRepository;
+    
+    @Autowired
+    PartnerprofileRepository partnerprofileRepository;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -40,6 +51,41 @@ public class PartnerImplementation implements PartnerRepository {
 			
 		}
 		return assignList;
+	}
+	
+	@Override
+	public Partner getPartnerByPartnerprofilePartnercontactEmailpartner(String emailpartner) {
+		
+		Partnercontact partnercontact = partnercontactRepository.getByEmailpartner(emailpartner);
+		
+		System.out.println("partner contact "+partnercontact.getEmailpartner());
+		
+		Partnerprofile partnerprofile = null;
+		
+		Partner partner = null;
+    	
+    	if (null != partnercontact) {
+    	
+    		partnerprofile = partnerprofileRepository.getByPartnercontact(partnercontact);
+    		
+    		System.out.println("partner profile "+partnerprofile.getIdpartnerprofile());
+    		
+    		int idpartner = partnerprofile.getIdpartnerprofile();
+    		
+    		Query query = em.createQuery("SELECT p FROM PARTNER p WHERE p.partnerprofile = :idpartnerprofile ", Partner.class);
+    		query.setParameter(1, idpartner);
+    		
+    		try {
+    			partner = (Partner) query.getSingleResult();
+    		
+    		}catch(Exception e) {
+    			
+    			System.out.println("Partner not found");
+    			
+    		}
+    	}
+    	
+		return partner;
 	}
 	
 	@Override
@@ -192,6 +238,7 @@ public class PartnerImplementation implements PartnerRepository {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 
 }

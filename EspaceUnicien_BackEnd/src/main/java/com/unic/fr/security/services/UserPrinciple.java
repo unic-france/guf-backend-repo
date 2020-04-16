@@ -23,14 +23,16 @@ public class UserPrinciple implements UserDetails {
     private String username;
 
     private String email;
-
+    
     @JsonIgnore
     private String password;
+    
+    private boolean onetimepassword;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserPrinciple(Long id, String uuid, String name, 
-			    		String username, String email, String password, 
+			    		String username, String email, String password, boolean oneTimePassword,
 			    		Collection<? extends GrantedAuthority> authorities) {
     	this.uuid = uuid;
         this.id = id;
@@ -38,6 +40,7 @@ public class UserPrinciple implements UserDetails {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.onetimepassword = oneTimePassword;
         this.authorities = authorities;
     }
 
@@ -53,6 +56,7 @@ public class UserPrinciple implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getOnetimepassword(),
                 authorities
         );
     }
@@ -76,6 +80,10 @@ public class UserPrinciple implements UserDetails {
     public String getEmail() {
         return email;
     }
+    
+    public boolean getOneTimePassword() {
+        return onetimepassword;
+    }
 
     @Override
     public String getUsername() {
@@ -86,6 +94,8 @@ public class UserPrinciple implements UserDetails {
     public String getPassword() {
         return password;
     }
+    
+    
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

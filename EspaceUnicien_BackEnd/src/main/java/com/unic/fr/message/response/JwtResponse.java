@@ -3,9 +3,11 @@ package com.unic.fr.message.response;
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
+    private boolean oneTimePassword;
 
-    public JwtResponse(String accessToken) {
+    public JwtResponse(String accessToken, boolean oneTimePassword) {
         this.token = accessToken;
+        this.oneTimePassword = oneTimePassword;
     }
 
     public String getAccessToken() {
@@ -22,5 +24,13 @@ public class JwtResponse {
 
     public void setTokenType(String tokenType) {
         this.type = tokenType;
+    }
+    
+    public boolean getOneTimePassword() {
+    	return this.oneTimePassword;
+    }
+    
+    public void setOneTimePassword(boolean oneTimePassword) {
+    	this.oneTimePassword = oneTimePassword;
     }
 }

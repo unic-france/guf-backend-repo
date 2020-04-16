@@ -12,6 +12,8 @@ public class PartnerDto {
 	
 	private PartnerprofileDto partnerprofile;
 	
+	private PartnercompanyDto partnercompany;
+	
 	//private List<AssignmentDto> assignments1;
 	
 	//private List<AssignmentDto> assignments2;
@@ -40,6 +42,14 @@ public class PartnerDto {
 
 	public void setPuid(String puid) {
 		this.puid = puid;
+	}
+
+	public PartnercompanyDto getPartnercompany() {
+		return partnercompany;
+	}
+
+	public void setPartnercompany(PartnercompanyDto partnercompany) {
+		this.partnercompany = partnercompany;
 	}
 
 	/*public List<AssignmentDto> getAssignments1() {
