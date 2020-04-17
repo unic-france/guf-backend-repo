@@ -39,8 +39,6 @@ public class AssignmentRestApi {
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	public List<AssignmentDto> getAssignmentList() {
 		
-		//Set<Assignment> assignmentList = null;
-		System.out.println("AssignmentDAO");
 		List<AssignmentDto> assignmentDtoList = null;
 		
 		try {
@@ -50,7 +48,6 @@ public class AssignmentRestApi {
 			Partner partner = partnerRepository.getByPuid(user.getUuid());
 			
 			List<Assignment> assignmentList= assignmentRepository.getAssignmentListByPartner1(partner);
-			//Utils.convertToList(assignmentRepository.getAssignmentListByPartner1(partner));
 			
 			//Permet de récupérer une liste de DTO directement sans avoir à boucler sur chaque élément
 			assignmentDtoList = modelMapper.map(assignmentList, new TypeToken<List<AssignmentDto>>(){}.getType());

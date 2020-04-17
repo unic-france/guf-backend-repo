@@ -28,6 +28,10 @@ public class AppProperties {
 	private String groupvalidationongoing;
 	
 	
+	@Value("${personalinvoicestatushistory.customersent}")
+	private String ppCustomersent;
+	
+	
 	//GETTER and SETTER
 	
 	public String getPersonalProductionInvoiceReferenceNumber() {
@@ -49,5 +53,10 @@ public class AppProperties {
 	public String getGroupvalidationongoing() {
 		return groupvalidationongoing;
 	}
+
+	public String getPpCustomersent() {
+		return ppCustomersent;
+	}
+	
 
 }
